@@ -124,7 +124,7 @@ void TaskServos(void *pvParameters) {
   ServosTaskInput servos_input;
   for (;;) {
     xQueueReceive(queue_servos, &servos_input, portMAX_DELAY);
-    int expressions_sum = servos_input.emotion_angry + servos_input.emotion_disgusted + servos_input.emotion_happy
+    float expressions_sum = servos_input.emotion_angry + servos_input.emotion_disgusted + servos_input.emotion_happy
                             + servos_input.emotion_neutral + servos_input.emotion_sad + servos_input.emotion_surprised;
     if (servos_input.animatronics_on == 1 && expressions_sum > 0) {
       float emotions[NUM_EMOTIONS] = {servos_input.emotion_angry / expressions_sum, servos_input.emotion_disgusted / expressions_sum,
