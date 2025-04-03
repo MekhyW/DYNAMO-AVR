@@ -7,11 +7,12 @@
 #include <semphr.h>
 #include <queue.h>
 #endif
+#ifdef TEST_MODE
+#include "TestCLI.h"
+#else
 #include "LEDs.h"
 #include "Servos.h"
 #include "Serial.h"
-#ifdef TEST_MODE
-#include "TestCLI.h"
 #endif
 #define TASK_STACK_SIZE 128
 #define QUEUE_SIZE 10

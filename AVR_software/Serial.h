@@ -1,3 +1,8 @@
+#include "TestConfig.h"
+#ifdef SIMULATE_HARDWARE
+#include "HardwareSim.h"
+#include "PCSandbox.h"
+#endif
 #define NUM_INPUTS 12
 int inputs[NUM_INPUTS] = {0};
 
@@ -22,7 +27,7 @@ bool parseReceivedData(String received_data) {
 void updateSerial() {
   String received_data = readFromSerial();
   if (received_data.length() > 0) {
-    if (parseReceivedData(received_data)) Serial.println("Acknowledged: " + received_data); 
+    if (parseReceivedData(received_data)) Serial.println("OK"); 
     else Serial.println("Invalid message format!");
   }
 }

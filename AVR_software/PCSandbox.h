@@ -12,42 +12,17 @@
 #include <mutex>
 #include <condition_variable>
 
-typedef struct {
+typedef struct TaskHandle {
     std::thread* thread;
     bool running;
-} TaskHandle_t;
+} *TaskHandle_t;
 
-template <typename T>
-class QueueHandle {
-private:
-    std::queue<T> queue;
+typedef struct QueueHandle {
+    std::queue<void*> queue;
     std::mutex mutex;
     std::condition_variable cv;
     size_t maxSize;
-public:
-    QueueHandle(size_t size) : maxSize(size) {}
-    bool send(T item, unsigned long timeout) {
-        std::unique_lock<std::mutex> lock(mutex);
-        if (queue.size() >= maxSize) {
-            return false;
-        }
-        queue.push(item);
-        cv.notify_one();
-        return true;
-    }
-    bool receive(T* item, unsigned long timeout) {
-        std::unique_lock<std::mutex> lock(mutex);
-        if (timeout > 0) {
-            cv.wait_for(lock, std::chrono::milliseconds(timeout), [this]{ return !queue.empty(); });
-        }
-        if (queue.empty()) {
-            return false;
-        }
-        *item = queue.front();
-        queue.pop();
-        return true;
-    }
-};
+} *QueueHandle_t;
 
 #define portTICK_PERIOD_MS 1
 #define pdTRUE 1
@@ -56,37 +31,41 @@ public:
 
 inline void xTaskCreate(void (*function)(void*), const char* name, 
                  int stackSize, void* parameters, int priority, TaskHandle_t* handle) {
-    TaskHandle_t newTask = new TaskHandle_t;
-    newTask->running = true;
-    newTask->thread = new std::thread([function, parameters, newTask]() {
-        while (newTask->running) {
+    *handle = new TaskHandle;
+    (*handle)->running = true;
+    (*handle)->thread = new std::thread([function, parameters, handle]() {
+        while ((*handle)->running) {
             function(parameters);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     });
-    
-    if (handle != NULL) {
-        *handle = newTask;
-    }
 }
 
 inline void vTaskDelay(const unsigned long ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-template <typename T>
-inline QueueHandle<T>* xQueueCreate(int size, int itemSize) {
-    return new QueueHandle<T>(size);
+inline QueueHandle_t xQueueCreate(int size, unsigned long long itemSize) {
+    QueueHandle_t queueHandle = new QueueHandle;
+    queueHandle->maxSize = size;
+    return queueHandle;
 }
 
-template <typename T>
-inline int xQueueSendToBack(QueueHandle<T>* queue, T* item, unsigned long timeout) {
-    return queue->send(*item, timeout) ? pdTRUE : pdFALSE;
+inline int xQueueSendToBack(QueueHandle_t queue, void* item, unsigned long timeout) {
+    std::unique_lock<std::mutex> lock(queue->mutex);
+    if (queue->queue.size() >= queue->maxSize) return pdFALSE;
+    queue->queue.push(item);
+    queue->cv.notify_one();
+    return pdTRUE;
 }
 
-template <typename T>
-inline int xQueueReceive(QueueHandle<T>* queue, T* item, unsigned long timeout) {
-    return queue->receive(item, timeout) ? pdTRUE : pdFALSE;
+inline int xQueueReceive(QueueHandle_t queue, void* item, unsigned long timeout) {
+    std::unique_lock<std::mutex> lock(queue->mutex);
+    if (timeout > 0) queue->cv.wait_for(lock, std::chrono::milliseconds(timeout), [queue] { return !queue->queue.empty(); });
+    if (queue->queue.empty()) return pdFALSE;
+    memcpy(item, queue->queue.front(), sizeof(item));
+    queue->queue.pop();
+    return pdTRUE;
 }
 
 #endif // Arduino_FreeRTOS_h
@@ -178,7 +157,7 @@ void digitalWrite(uint8_t pin, uint8_t val) {
 }
 
 int digitalRead(uint8_t pin) {
-    return HIGH; // Default to HIGH for simulation
+    return LOW;
 }
 
 unsigned long millis() {

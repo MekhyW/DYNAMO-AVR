@@ -8,17 +8,19 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#define NEO_GRB ((1 << 6) | (1 << 4) | (0 << 2) | (2))
+#define NEO_KHZ800 0x0000
 
 class Adafruit_NeoPixel_Sim {
 private:
     int num_pixels;
     int pin;
-    int type;
+    uint16_t type;
     int brightness;
     std::vector<uint32_t> pixels;
     
 public:
-    Adafruit_NeoPixel_Sim(int n, int p, int t) : num_pixels(n), pin(p), type(t), brightness(50) {
+    Adafruit_NeoPixel_Sim(int n, int p, uint16_t t) : num_pixels(n), pin(p), type(t), brightness(50) {
         pixels.resize(n, 0);
     }
     void begin() { 
@@ -74,11 +76,8 @@ public:
     }
     void write(int pos) {
         position = pos;
-        if (attached) {
-            std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
-        } else {
-            std::cout << "Warning: Trying to move detached servo on pin " << pin << std::endl;
-        }
+        if (attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
+        else std::cout << "Warning: Trying to move detached servo on pin " << pin << std::endl;
     }
     int read() { return position; }
     bool attached() { return attached; }

@@ -22,7 +22,8 @@ Runs on the Lattepanda Delta´s Arduino Leonardo co-processor
 
 - Compile with:
    ```bash
-   g++ -std=c++11 AVR_software.ino -o AVR_software_sim -pthread
+   cd AVR_software
+   g++ -std=c++11 AVR_software.cpp -o AVR_software_sim -pthread
    ```
 
 - Run the simulation:

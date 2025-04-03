@@ -8,6 +8,8 @@
 #else
 #include <Arduino_FreeRTOS.h>
 #endif
+#include "LEDs.h"
+#include "Servos.h"
 
 #ifdef TEST_MODE
 
@@ -43,7 +45,6 @@ void init_cli_queues(QueueHandle_t* leds_queue, QueueHandle_t* servos_queue) {
 }
 
 void process_command(char* input) {
-    
     char* argv[MAX_ARGS];
     int argc = 0;
     char* token = strtok(input, " ");
