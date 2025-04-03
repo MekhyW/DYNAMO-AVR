@@ -21,33 +21,6 @@
 QueueHandle_t queue_leds;
 QueueHandle_t queue_servos;
 
-void setup() {
-  Serial.begin(9600);
-  while (!Serial) {;}
-  Serial.println("Starting up...");
-  queue_leds = xQueueCreate(QUEUE_SIZE, sizeof(LEDsTaskInput));
-  queue_servos = xQueueCreate(QUEUE_SIZE, sizeof(ServosTaskInput));
-  if (queue_leds == NULL || queue_servos == NULL) {
-    Serial.println("Error: failed to create queue");
-    while (1) {;}
-  }
-  #ifdef TEST_MODE
-  Serial.println("*** TEST MODE ACTIVE ***");
-  init_cli_queues(&queue_leds, &queue_servos);
-  xTaskCreate(TaskHandleCLI, "CLI", TASK_STACK_SIZE * 2, NULL, 2, NULL);
-  #endif
-  #ifdef SIMULATE_HARDWARE
-  Serial.println("*** HARDWARE SIMULATION ACTIVE ***");
-  #endif
-  setupLEDs();
-  setupServos();
-  xTaskCreate(TaskReadSerial, "ReadSerial", TASK_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(TaskLEDs, "LEDs", TASK_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(TaskServos, "Servos", TASK_STACK_SIZE, NULL, 1, NULL);
-}
-
-void loop() {}
-
 /*--------------------------------------------------*/
 /*---------------------- Tasks ---------------------*/
 /*--------------------------------------------------*/
@@ -166,3 +139,34 @@ void TaskServos(void *pvParameters) {
     vTaskDelay(TASK_DELAY_MS / portTICK_PERIOD_MS);
   }
 }
+
+/*--------------------------------------------------*/
+/*------------------- Setup/Loop -------------------*/
+/*--------------------------------------------------*/
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) {;}
+  Serial.println("Starting up...");
+  queue_leds = xQueueCreate(QUEUE_SIZE, sizeof(LEDsTaskInput));
+  queue_servos = xQueueCreate(QUEUE_SIZE, sizeof(ServosTaskInput));
+  if (queue_leds == NULL || queue_servos == NULL) {
+    Serial.println("Error: failed to create queue");
+    while (1) {;}
+  }
+  #ifdef TEST_MODE
+  Serial.println("*** TEST MODE ACTIVE ***");
+  init_cli_queues(&queue_leds, &queue_servos);
+  xTaskCreate(TaskHandleCLI, "CLI", TASK_STACK_SIZE * 2, NULL, 2, NULL);
+  #endif
+  #ifdef SIMULATE_HARDWARE
+  Serial.println("*** HARDWARE SIMULATION ACTIVE ***");
+  #endif
+  setupLEDs();
+  setupServos();
+  xTaskCreate(TaskReadSerial, "ReadSerial", TASK_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(TaskLEDs, "LEDs", TASK_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(TaskServos, "Servos", TASK_STACK_SIZE, NULL, 1, NULL);
+}
+
+void loop() {}

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdint>
 #define NEO_GRB ((1 << 6) | (1 << 4) | (0 << 2) | (2))
 #define NEO_KHZ800 0x0000
 
@@ -60,27 +61,27 @@ public:
 class Servo_Sim {
 private:
     int pin;
-    bool attached;
+    bool is_attached;
     int position;
     
 public:
-    Servo_Sim() : pin(-1), attached(false), position(90) {}
+    Servo_Sim() : pin(-1), is_attached(false), position(90) {}
     void attach(int p) {
         pin = p;
-        attached = true;
+        is_attached = true;
         std::cout << "Servo attached to pin " << pin << std::endl;
     }
     void detach() {
-        attached = false;
+        is_attached = false;
         std::cout << "Servo on pin " << pin << " detached" << std::endl;
     }
     void write(int pos) {
         position = pos;
-        if (attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
+        if (is_attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
         else std::cout << "Warning: Trying to move detached servo on pin " << pin << std::endl;
     }
     int read() { return position; }
-    bool attached() { return attached; }
+    bool attached() { return is_attached; }
 };
 
 #define Adafruit_NeoPixel Adafruit_NeoPixel_Sim

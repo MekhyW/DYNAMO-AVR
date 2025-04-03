@@ -85,6 +85,27 @@ inline int xQueueReceive(QueueHandle_t queue, void* item, unsigned long timeout)
 #define OUTPUT 1
 #define INPUT_PULLUP 2
 
+class String {
+    private:
+        std::string str;
+    public:
+        String() : str("") {}
+        String(const char* s) : str(s) {}
+        String(const std::string& s) : str(s) {}
+        const char* c_str() const { return str.c_str(); }
+        int length() const { return str.length(); }
+        int indexOf(char c, int start = 0) const {
+            size_t pos = str.find(c, start);
+            return (pos == std::string::npos) ? -1 : pos;
+        }
+        String substring(int start, int end) const {
+            return String(str.substr(start, end - start).c_str());
+        }
+        int toInt() const {
+            return std::stoi(str);
+        }
+    };
+
 class SerialClass {
 public:
     void begin(long speed) {
@@ -125,27 +146,6 @@ public:
         return String(input.c_str());
     }
     operator bool() const { return true; }
-};
-
-class String {
-private:
-    std::string str;
-public:
-    String() : str("") {}
-    String(const char* s) : str(s) {}
-    String(const std::string& s) : str(s) {}
-    const char* c_str() const { return str.c_str(); }
-    int length() const { return str.length(); }
-    int indexOf(char c, int start = 0) const {
-        size_t pos = str.find(c, start);
-        return (pos == std::string::npos) ? -1 : pos;
-    }
-    String substring(int start, int end) const {
-        return String(str.substr(start, end - start).c_str());
-    }
-    int toInt() const {
-        return std::stoi(str);
-    }
 };
 
 void pinMode(uint8_t pin, uint8_t mode) {
