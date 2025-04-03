@@ -1,4 +1,10 @@
+#include "TestConfig.h"
+#ifndef SIMULATE_HARDWARE
 #include <Servo.h>
+#else
+#include "HardwareSim.h"
+#include "PCSandbox.h"
+#endif
 #define NUM_SERVOS 2
 #define NUM_EMOTIONS 6
 #define DETACH_THRESHOLD 1000

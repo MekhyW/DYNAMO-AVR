@@ -1,4 +1,10 @@
+#include "TestConfig.h"
+#ifndef SIMULATE_HARDWARE
 #include <Adafruit_NeoPixel.h>
+#else
+#include "HardwareSim.h"
+#include "PCSandbox.h"
+#endif
 #define LED_PIN 13
 #define LED_COUNT 240
 Adafruit_NeoPixel GearsStrip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);

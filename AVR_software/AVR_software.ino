@@ -1,9 +1,18 @@
+#include "TestConfig.h"
+#ifdef SIMULATE_HARDWARE
+#include "HardwareSim.h"
+#include "PCSandbox.h"
+#else
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
 #include <queue.h>
+#endif
 #include "LEDs.h"
 #include "Servos.h"
 #include "Serial.h"
+#ifdef TEST_MODE
+#include "TestCLI.h"
+#endif
 #define TASK_STACK_SIZE 128
 #define QUEUE_SIZE 10
 #define TASK_DELAY_MS 10
@@ -15,17 +24,25 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) {;}
   Serial.println("Starting up...");
-  setupLEDs();
-  setupServos();
-  xTaskCreate(TaskReadSerial, "ReadSerial", TASK_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(TaskLEDs, "LEDs", TASK_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(TaskServos, "Servos", TASK_STACK_SIZE, NULL, 1, NULL);
   queue_leds = xQueueCreate(QUEUE_SIZE, sizeof(LEDsTaskInput));
   queue_servos = xQueueCreate(QUEUE_SIZE, sizeof(ServosTaskInput));
   if (queue_leds == NULL || queue_servos == NULL) {
     Serial.println("Error: failed to create queue");
     while (1) {;}
   }
+  #ifdef TEST_MODE
+  Serial.println("*** TEST MODE ACTIVE ***");
+  init_cli_queues(&queue_leds, &queue_servos);
+  xTaskCreate(TaskHandleCLI, "CLI", TASK_STACK_SIZE * 2, NULL, 2, NULL);
+  #endif
+  #ifdef SIMULATE_HARDWARE
+  Serial.println("*** HARDWARE SIMULATION ACTIVE ***");
+  #endif
+  setupLEDs();
+  setupServos();
+  xTaskCreate(TaskReadSerial, "ReadSerial", TASK_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(TaskLEDs, "LEDs", TASK_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(TaskServos, "Servos", TASK_STACK_SIZE, NULL, 1, NULL);
 }
 
 void loop() {}
@@ -34,11 +51,43 @@ void loop() {}
 /*---------------------- Tasks ---------------------*/
 /*--------------------------------------------------*/
 
+#ifdef TEST_MODE
+void TaskHandleCLI(void *pvParameters) {
+  (void) pvParameters;
+  char command_buffer[MAX_COMMAND_LENGTH];
+  int index = 0;
+  Serial.println("CLI interface ready. Type 'help' for commands.");
+  for (;;) {
+    if (Serial.available() > 0) {
+      char c = Serial.read();
+      if (c == '\b' && index > 0) {
+        index--;
+        Serial.print("\b \b");
+      }
+      else if (c == '\r' || c == '\n') {
+        command_buffer[index] = '\0';
+        Serial.println();
+        if (index > 0) {
+          process_command(command_buffer);
+          index = 0;
+        }
+      }
+      else if (index < MAX_COMMAND_LENGTH - 1) {
+        command_buffer[index++] = c;
+        Serial.print(c);
+      }
+    }
+    vTaskDelay(10 / portTICK_PERIOD_MS);
+  }
+}
+#endif
+
 void TaskReadSerial(void *pvParameters) {
   (void) pvParameters;
   LEDsTaskInput leds_input;
   ServosTaskInput servos_input;
   for (;;) {
+    #ifndef TEST_MODE
     updateSerial();
     servos_input.animatronics_on = inputs[0];
     leds_input.leds_on = inputs[1];
@@ -60,6 +109,7 @@ void TaskReadSerial(void *pvParameters) {
       xQueueReceive(queue_servos, &servos_input, 0);
       xQueueSendToBack(queue_servos, &servos_input, 0);
     }
+    #endif
     vTaskDelay(TASK_DELAY_MS / portTICK_PERIOD_MS);
   }
 }
@@ -108,9 +158,7 @@ void TaskServos(void *pvParameters) {
                           servos_input.emotion_sad / expressions_sum, servos_input.emotion_surprised / expressions_sum};
       int pos[NUM_SERVOS] = {0};
       for (int i = 0; i < NUM_EMOTIONS; i++) {
-        for (int j = 0; j < NUM_SERVOS; j++) {
-          pos[j] += emotions[i] * servo_calibration_matrix[i][j];
-        }
+        for (int j = 0; j < NUM_SERVOS; j++) { pos[j] += emotions[i] * servo_calibration_matrix[i][j]; }
       }
       writepos(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7]);
     }
