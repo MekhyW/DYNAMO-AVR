@@ -30,7 +30,9 @@ public:
     void show() { 
         std::cout << "NeoPixel update: " << pixels.size() << " pixels, brightness: " << brightness << std::endl; 
     }
-    void setBrightness(int b) { brightness = b; }
+    void setBrightness(int b) { 
+        brightness = b; 
+    }
     int getBrightness() { return brightness; }
     void setPixelColor(int i, uint32_t c) {
         if (i >= 0 && i < num_pixels) pixels[i] = c;
@@ -39,20 +41,22 @@ public:
         if (i >= 0 && i < num_pixels) return pixels[i];
         return 0;
     }
-    int numPixels() { return num_pixels; }
+    int numPixels() { 
+        return num_pixels; 
+    }
     void clear() {
         for (int i = 0; i < num_pixels; i++) pixels[i] = 0;
         std::cout << "NeoPixel strip cleared" << std::endl;
     }
     void fill(uint32_t c, int first, int count) {
-        for (int i = first; i < first + count && i < num_pixels; i++) {
-            pixels[i] = c;
-        }
+        for (int i = first; i < first + count && i < num_pixels; i++) pixels[i] = c;
     }
     uint32_t Color(uint8_t r, uint8_t g, uint8_t b) {
         return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
     }
-    uint32_t gamma32(uint32_t color) { return color; } // Simplified
+    uint32_t gamma32(uint32_t color) { 
+        return color; // Simplified
+    }
     uint32_t ColorHSV(uint16_t hue, uint8_t sat = 255, uint8_t val = 255) {
         return Color(val, val, val); // Just return white for simplicity
     }
