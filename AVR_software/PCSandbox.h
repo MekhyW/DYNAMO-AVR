@@ -29,16 +29,16 @@ typedef struct QueueHandle {
 #define pdFALSE 0
 #define portMAX_DELAY ULONG_MAX
 
-inline void xTaskCreate(void (*function)(void*), const char* name, 
-                 int stackSize, void* parameters, int priority, TaskHandle_t* handle) {
-    *handle = new TaskHandle;
-    (*handle)->running = true;
-    (*handle)->thread = new std::thread([function, parameters, handle]() {
-        while ((*handle)->running) {
+inline void xTaskCreate(void (*function)(void*), const char* name, int stackSize, void* parameters, int priority, TaskHandle_t* handle) {
+    TaskHandle_t taskHandle = new TaskHandle;
+    taskHandle->running = true;
+    taskHandle->thread = new std::thread([function, parameters, taskHandle]() {
+        while (taskHandle->running) {
             function(parameters);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     });
+    if (handle != NULL) *handle = taskHandle;
 }
 
 inline void vTaskDelay(const unsigned long ms) {
@@ -54,16 +54,25 @@ inline QueueHandle_t xQueueCreate(int size, unsigned long long itemSize) {
 inline int xQueueSendToBack(QueueHandle_t queue, void* item, unsigned long timeout) {
     std::unique_lock<std::mutex> lock(queue->mutex);
     if (queue->queue.size() >= queue->maxSize) return pdFALSE;
-    queue->queue.push(item);
+    void* itemCopy = malloc(sizeof(item));
+    memcpy(itemCopy, item, sizeof(item));
+    queue->queue.push(itemCopy);
     queue->cv.notify_one();
     return pdTRUE;
 }
 
 inline int xQueueReceive(QueueHandle_t queue, void* item, unsigned long timeout) {
     std::unique_lock<std::mutex> lock(queue->mutex);
-    if (timeout > 0) queue->cv.wait_for(lock, std::chrono::milliseconds(timeout), [queue] { return !queue->queue.empty(); });
+    if (timeout == portMAX_DELAY) {
+        queue->cv.wait(lock, [queue] { return !queue->queue.empty(); });
+    } 
+    else if (timeout > 0) {
+        queue->cv.wait_for(lock, std::chrono::milliseconds(timeout), [queue] { return !queue->queue.empty(); });
+    }
     if (queue->queue.empty()) return pdFALSE;
-    memcpy(item, queue->queue.front(), sizeof(item));
+    void* queueItem = queue->queue.front();
+    memcpy(item, queueItem, sizeof(item));
+    free(queueItem);
     queue->queue.pop();
     return pdTRUE;
 }
