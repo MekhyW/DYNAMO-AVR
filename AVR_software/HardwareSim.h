@@ -84,8 +84,12 @@ public:
         if (is_attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
         else std::cout << "Warning: Trying to move detached servo on pin " << pin << std::endl;
     }
-    int read() { return position; }
-    bool attached() { return is_attached; }
+    int read() { 
+        return position; 
+    }
+    bool attached() { 
+        return is_attached; 
+    }
 };
 
 #define Adafruit_NeoPixel Adafruit_NeoPixel_Sim
