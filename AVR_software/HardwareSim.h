@@ -54,11 +54,42 @@ public:
     uint32_t Color(uint8_t r, uint8_t g, uint8_t b) {
         return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
     }
-    uint32_t gamma32(uint32_t color) { 
-        return color; // Simplified
+    uint32_t gamma32(uint32_t color) {
+        static const uint8_t gammaTable[256] = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
+        };
+        uint8_t r = (color >> 16) & 0xFF;
+        uint8_t g = (color >> 8) & 0xFF;
+        uint8_t b = color & 0xFF;
+        r = gammaTable[r];
+        g = gammaTable[g];
+        b = gammaTable[b];
+        return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
     }
     uint32_t ColorHSV(uint16_t hue, uint8_t sat = 255, uint8_t val = 255) {
-        return Color(val, val, val); // Just return white for simplicity
+        uint8_t r, g, b;
+        hue = hue % 65536;
+        uint8_t region = hue / 10923; // 65536 / 6 = 10922.66
+        uint16_t remainder = (hue - (region * 10923)) * 6;
+        uint8_t p = (val * (255 - sat)) / 255;
+        uint8_t q = (val * (255 - ((sat * remainder) / 65536))) / 255;
+        uint8_t t = (val * (255 - ((sat * (65536 - remainder)) / 65536))) / 255;
+        switch(region) {
+            case 0: r = val; g = t; b = p; break;
+            case 1: r = q; g = val; b = p; break;
+            case 2: r = p; g = val; b = t; break;
+            case 3: r = p; g = q; b = val; break;
+            case 4: r = t; g = p; b = val; break;
+            default: r = val; g = p; b = q; break;
+        }
+        return Color(r, g, b);
     }
 };
 
