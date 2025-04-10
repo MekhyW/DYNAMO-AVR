@@ -103,10 +103,6 @@ void cmd_servo_test(int argc, char* argv[]) {
         return;
     }
     servos[servo_index].write(position);
-    Serial.print("Servo ");
-    Serial.print(servo_index);
-    Serial.print(" moved to position ");
-    Serial.println(position);
 }
 
 void cmd_emotion_test(int argc, char* argv[]) {
