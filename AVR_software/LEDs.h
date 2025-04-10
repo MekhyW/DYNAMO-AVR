@@ -36,79 +36,120 @@ struct LEDsTaskInput
   int leds_level;
 };
 
-void colorStatic() {
-  MainStrip.setBrightness(Color_Brightness/2);
+void setBrightnessStrips(int brightness) {
+  MainStrip.setBrightness(brightness);
+  MaskStripLeft.setBrightness(brightness);
+  MaskStripRight.setBrightness(brightness);
+}
+void fillStrips(uint32_t color) {
   MainStrip.fill(color, 0, MainStrip.numPixels());
+  MaskStripLeft.fill(color, 0, MaskStripLeft.numPixels());
+  MaskStripRight.fill(color, 0, MaskStripRight.numPixels());
+}
+void showStrips() {
   MainStrip.show();
+  MaskStripLeft.show();
+  MaskStripRight.show();
+}
+void clearStrips() {
+  MainStrip.clear();
+  MaskStripLeft.clear();
+  MaskStripRight.clear();
+}
+
+void colorStatic() {
+  setBrightnessStrips(Color_Brightness/2);
+  fillStrips(color);
+  showStrips();
 }
 
 void colorFade() {
-    MainStrip.setBrightness(Color_Brightness);
-    for(int k = 0; k < Color_Brightness*2; k++) {
-      MainStrip.fill(color, 0, MainStrip.numPixels());
-      MainStrip.setBrightness(k);
-      MainStrip.show();
-      vTaskDelay(20 / portTICK_PERIOD_MS);
-    }
-    for(int k = Color_Brightness*2; k > 0; k--) {
-      MainStrip.fill(color, 0, MainStrip.numPixels());
-      MainStrip.setBrightness(k);
-      MainStrip.show();
-      vTaskDelay(20 / portTICK_PERIOD_MS);
-    }
+  setBrightnessStrips(Color_Brightness);
+  for(int k = 0; k < Color_Brightness*2; k++) {
+    fillStrips(color);
+    setBrightnessStrips(k);
+    showStrips();
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+  }
+  for(int k = Color_Brightness*2; k > 0; k--) {
+    fillStrips(color);
+    setBrightnessStrips(k);
+    showStrips();
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+  }
 }
 
 void colorWipe() {
-  MainStrip.setBrightness(Color_Brightness);
+  setBrightnessStrips(Color_Brightness);
   if (MainStrip.getPixelColor(0) == 0)
   {
     for(uint16_t i=0; i<MainStrip.numPixels(); i++) {
       MainStrip.setPixelColor(i, color);
-      MainStrip.show();
+      showStrips();
+      vTaskDelay(20 / portTICK_PERIOD_MS);
+    }
+    for(uint16_t i=0; i<MaskStripLeft.numPixels(); i++) {
+      MaskStripLeft.setPixelColor(i, color);
+      MaskStripRight.setPixelColor(i, color);
+      showStrips();
       vTaskDelay(20 / portTICK_PERIOD_MS);
     }
   } else {
     for(uint16_t i=0; i<MainStrip.numPixels(); i++) {
       MainStrip.setPixelColor(i, black);
-      MainStrip.show();
+      showStrips();
+      vTaskDelay(20 / portTICK_PERIOD_MS);
+    }
+    for(uint16_t i=0; i<MaskStripLeft.numPixels(); i++) {
+      MaskStripLeft.setPixelColor(i, black);
+      MaskStripRight.setPixelColor(i, black);
+      showStrips();
       vTaskDelay(20 / portTICK_PERIOD_MS);
     }
   }
 }
 
-
 void colorTheaterChase() {
-  MainStrip.setBrightness(Color_Brightness*2);
+  setBrightnessStrips(Color_Brightness*2);
   for(int b=0; b<3; b++) {
-    MainStrip.clear();
+    clearStrips();
     for(int c=b; c<MainStrip.numPixels(); c += 3) {
       MainStrip.setPixelColor(c, color);
     }
-    MainStrip.show();
+    for(int c=b; c<MaskStripLeft.numPixels(); c += 3) {
+      MaskStripLeft.setPixelColor(c, color);
+      MaskStripRight.setPixelColor(c, color);
+    }
+    showStrips();
     vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
 void Rainbow() {
-  MainStrip.setBrightness(Color_Brightness*2);
+  setBrightnessStrips(Color_Brightness*2);
   for(long firstPixelHue = 0; firstPixelHue < 65536; firstPixelHue += 512) {
     for(int i=0; i<MainStrip.numPixels(); i++) {
       int pixelHue = firstPixelHue + (i * 65536L / MainStrip.numPixels());
       MainStrip.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
     }
-    MainStrip.show();
+    for(int i=0; i<MaskStripLeft.numPixels(); i++) {
+      int pixelHue = firstPixelHue + (i * 65536L / MaskStripLeft.numPixels());
+      MaskStripLeft.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
+      MaskStripRight.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
+    }
+    showStrips();
     vTaskDelay(50 / portTICK_PERIOD_MS);
   }
 }
 
 void colorStrobe() {
-  MainStrip.setBrightness(Color_Brightness/2);
+  setBrightnessStrips(Color_Brightness/2);
   for(int j = 0; j < 5; j++) {
-    MainStrip.fill(color, 0, MainStrip.numPixels());
-    MainStrip.show();
+    fillStrips(color);
+    showStrips();
     vTaskDelay(50 / portTICK_PERIOD_MS);
-    MainStrip.clear();
-    MainStrip.show();
+    clearStrips();
+    showStrips();
     vTaskDelay(50 / portTICK_PERIOD_MS);
   }
   vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -117,11 +158,11 @@ void colorStrobe() {
 void colorMovingSubstrips() {
   uint32_t color_a = color;
   uint32_t color_b = black;
-  MainStrip.setBrightness(Color_Brightness*2);
+  setBrightnessStrips(Color_Brightness*2);
   int numPixels = MainStrip.numPixels();
   int substrip_size = numPixels/10;
   for(int i = 0; i < numPixels; i++) {
-    MainStrip.clear();
+    clearStrips();
     for(int j = 0; j < numPixels; j += substrip_size*2) {
       int startPixel = (i + j) % numPixels;
       MainStrip.fill(color_a, startPixel, substrip_size);
@@ -134,25 +175,24 @@ void colorMovingSubstrips() {
 }
 
 void off() {
-  MainStrip.clear();
-  MainStrip.show();
+  clearStrips();
+  showStrips();
 }
 
 void colorLevel(int level_percent) {
-  MainStrip.setBrightness(Color_Brightness);
-  MainStrip.clear();
+  setBrightnessStrips(Color_Brightness);
+  clearStrips();
   MainStrip.fill(color, 0, int(MainStrip.numPixels() * level_percent / 100));
-  MainStrip.show();
+  MaskStripLeft.fill(color, 0, int(MaskStripLeft.numPixels() * level_percent / 100));
+  MaskStripRight.fill(color, 0, int(MaskStripRight.numPixels() * level_percent / 100));
+  showStrips();
 }
 
 void setupLEDs() {
   MainStrip.begin();
   MaskStripLeft.begin();
   MaskStripRight.begin();
-  MainStrip.setBrightness(Color_Brightness);
-  MaskStripLeft.setBrightness(Color_Brightness);
-  MaskStripRight.setBrightness(Color_Brightness);
-  MainStrip.clear(); MainStrip.show();
-  MaskStripLeft.clear(); MaskStripLeft.show();
-  MaskStripRight.clear(); MaskStripRight.show();
+  setBrightnessStrips(Color_Brightness);
+  clearStrips();
+  showStrips();
 }
