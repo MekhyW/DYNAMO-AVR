@@ -112,7 +112,8 @@ public:
     }
     void write(int pos) {
         position = pos;
-        if (is_attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
+        if (pos < 0 || pos > 180) std::cout << "Warning: Invalid servo position " << pos << " on pin " << pin << std::endl;
+        else if (is_attached) std::cout << "Servo on pin " << pin << " moved to position " << position << std::endl;
         else std::cout << "Warning: Trying to move detached servo on pin " << pin << std::endl;
     }
     int read() { 

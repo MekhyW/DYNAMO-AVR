@@ -7,8 +7,6 @@
 #endif
 #define NUM_SERVOS 2
 #define NUM_EMOTIONS 6
-#define DETACH_THRESHOLD 1000
-#define POSITION_CHANGE_TOLERANCE 10
 #define SERVO_0_PIN 6
 #define SERVO_1_PIN 11
 
@@ -24,8 +22,6 @@ int servo_calibration_matrix[NUM_EMOTIONS][NUM_SERVOS] = {
   {90, 90}, // sad
   {90, 90}  // surprised
 };
-int previousServoPositions[NUM_SERVOS];
-unsigned long lastChangeTime[NUM_SERVOS];
 
 struct ServosTaskInput
 {
@@ -41,25 +37,13 @@ struct ServosTaskInput
 void setupServos() {
   servos[0].attach(SERVO_0_PIN);
   servos[1].attach(SERVO_1_PIN);
-  for (int i = 0; i < NUM_SERVOS; i++) {
-    previousServoPositions[i] = 90;
-    lastChangeTime[i] = 0;
-  }
-}
-
-void detachIfNoChange(int servoIndex, int newPos) {
-  if (abs(newPos - previousServoPositions[servoIndex]) > POSITION_CHANGE_TOLERANCE) {
-    servos[servoIndex].attach(servoIndex + 4);
-    lastChangeTime[servoIndex] = millis();
-  } else if (millis() - lastChangeTime[servoIndex] > DETACH_THRESHOLD) { servos[servoIndex].detach(); }
 }
 
 void writepos(int eyebrow_left_pos, int eyebrow_right_pos, int ear_pan_left_pos, int ear_tilt_left_pos,
               int ear_pan_right_pos, int ear_tilt_right_pos, int mouth_left_pos, int mouth_right_pos) {
   int newServoPositions[NUM_SERVOS] = { eyebrow_left_pos, eyebrow_right_pos };
   for (int i = 0; i < NUM_SERVOS; i++) {
-    detachIfNoChange(i, newServoPositions[i]);
+    if (newServoPositions[i] < 0 || newServoPositions[i] > 180) return;
     servos[i].write(newServoPositions[i]);
-    previousServoPositions[i] = newServoPositions[i];
   }
 }
