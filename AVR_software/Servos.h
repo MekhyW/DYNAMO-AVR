@@ -9,6 +9,8 @@
 #define NUM_EMOTIONS 6
 #define DETACH_THRESHOLD 1000
 #define POSITION_CHANGE_TOLERANCE 10
+#define SERVO_0_PIN 6
+#define SERVO_1_PIN 11
 
 Servo eyebrow_left;
 Servo eyebrow_right;
@@ -37,8 +39,8 @@ struct ServosTaskInput
 };
 
 void setupServos() {
-  servos[0].attach(6);
-  servos[1].attach(11);
+  servos[0].attach(SERVO_0_PIN);
+  servos[1].attach(SERVO_1_PIN);
   for (int i = 0; i < NUM_SERVOS; i++) {
     previousServoPositions[i] = 90;
     lastChangeTime[i] = 0;
