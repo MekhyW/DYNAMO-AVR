@@ -121,7 +121,7 @@ public:
         std::cout << "Serial initialized at " << speed << " baud" << std::endl;
     }
     bool available() {
-        return std::cin.rdbuf()->in_avail() > 0;
+        return std::cin.rdbuf()->in_avail() > 0 || std::cin.peek() != EOF;
     }
     char read() {
         char c;
