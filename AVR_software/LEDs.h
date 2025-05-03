@@ -24,7 +24,7 @@ uint32_t light_blue = MainStrip.Color(0, 255, 255);
 uint32_t orange = MainStrip.Color(255, 165, 0);
 uint32_t green = MainStrip.Color(0, 255, 0);
 
-int Color_Brightness = 25;
+int Color_Brightness = 25; // 0 - 255
 uint32_t color = white;
 
 struct LEDsTaskInput
