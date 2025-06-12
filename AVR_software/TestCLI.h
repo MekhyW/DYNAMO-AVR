@@ -76,7 +76,7 @@ void cmd_help(int argc, char* argv[]) {
 
 void cmd_leds_test(int argc, char* argv[]) {
     if (argc < 4) {
-        Serial.println("Usage: leds <effect> <color> <brightness>");
+        Serial.println("Usage: leds <effect> <color_r> <color_g> <color_b> <brightness>");
         return;
     }
     if (g_queue_leds == NULL) {
@@ -84,9 +84,11 @@ void cmd_leds_test(int argc, char* argv[]) {
         return;
     }
     int effect = atoi(argv[1]);
-    int color_index = atoi(argv[2]);
-    int brightness = atoi(argv[3]);
-    LEDsTaskInput leds_input = {1, brightness, color_index, effect, 100};
+    int color_r = atoi(argv[2]);
+    int color_g = atoi(argv[3]);
+    int color_b = atoi(argv[4]);
+    int brightness = atoi(argv[5]);
+    LEDsTaskInput leds_input = {1, brightness, color_r, color_g, color_b, effect, 100};
     if (xQueueSendToBack(*g_queue_leds, &leds_input, 0) != pdTRUE) Serial.println("Error: Queue full");
     else Serial.println("LED test command sent"); 
 }
@@ -153,18 +155,20 @@ void cmd_set_inputs(int argc, char* argv[]) {
     LEDsTaskInput leds_input = {
         input_values[1],  // leds_on
         input_values[2],  // leds_brightness
-        input_values[3],  // leds_color
-        input_values[4],  // leds_effect
-        input_values[5]   // leds_level
+        input_values[3],  // leds_color_r
+        input_values[4],  // leds_color_g
+        input_values[5],  // leds_color_b
+        input_values[6],  // leds_effect
+        input_values[7]   // leds_level
     };
     ServosTaskInput servos_input = {
         input_values[0],  // animatronics_on
-        input_values[6],  // emotion_angry
-        input_values[7],  // emotion_disgusted
-        input_values[8],  // emotion_happy
-        input_values[9],  // emotion_neutral
-        input_values[10], // emotion_sad
-        input_values[11]  // emotion_surprised
+        input_values[8],  // emotion_angry
+        input_values[9],  // emotion_disgusted
+        input_values[10],  // emotion_happy
+        input_values[11],  // emotion_neutral
+        input_values[12], // emotion_sad
+        input_values[13]  // emotion_surprised
     };
     if (xQueueSendToBack(*g_queue_leds, &leds_input, 0) != pdTRUE) Serial.println("Error: LED queue full");
     if (xQueueSendToBack(*g_queue_servos, &servos_input, 0) != pdTRUE) Serial.println("Error: Servo queue full");

@@ -31,7 +31,9 @@ struct LEDsTaskInput
 {
   int leds_on;
   int leds_brightness;
-  int leds_color;
+  int leds_color_r;
+  int leds_color_g;
+  int leds_color_b;
   int leds_effect;
   int leds_level;
 };

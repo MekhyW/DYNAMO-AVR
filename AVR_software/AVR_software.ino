@@ -66,15 +66,17 @@ void TaskReadSerial(void *pvParameters) {
     servos_input.animatronics_on = inputs[0];
     leds_input.leds_on = inputs[1];
     leds_input.leds_brightness = inputs[2];
-    leds_input.leds_color = inputs[3];
-    leds_input.leds_effect = inputs[4];
-    leds_input.leds_level = inputs[5];
-    servos_input.emotion_angry = inputs[6];
-    servos_input.emotion_disgusted = inputs[7];
-    servos_input.emotion_happy = inputs[8];
-    servos_input.emotion_neutral = inputs[9];
-    servos_input.emotion_sad = inputs[10];
-    servos_input.emotion_surprised = inputs[11];
+    leds_input.leds_color_r = inputs[3];
+    leds_input.leds_color_g = inputs[4];
+    leds_input.leds_color_b = inputs[5];
+    leds_input.leds_effect = inputs[6];
+    leds_input.leds_level = inputs[7];
+    servos_input.emotion_angry = inputs[8];
+    servos_input.emotion_disgusted = inputs[9];
+    servos_input.emotion_happy = inputs[10];
+    servos_input.emotion_neutral = inputs[11];
+    servos_input.emotion_sad = inputs[12];
+    servos_input.emotion_surprised = inputs[13];
     if (xQueueSendToBack(queue_leds, &leds_input, 0) != pdTRUE) {
       xQueueReceive(queue_leds, &leds_input, 0);
       xQueueSendToBack(queue_leds, &leds_input, 0);
@@ -99,10 +101,7 @@ void TaskLEDs(void *pvParameters) {
       continue;
     }
     Color_Brightness = leds_input.leds_brightness;
-    color = (leds_input.leds_color == 0) ? white : (leds_input.leds_color == 1) ? red : (leds_input.leds_color == 2) ? purple
-          : (leds_input.leds_color == 3) ? yellow : (leds_input.leds_color == 4) ? pink : (leds_input.leds_color == 5) ? deep_blue
-          : (leds_input.leds_color == 6) ? light_blue : (leds_input.leds_color == 7) ? orange : (leds_input.leds_color == 8) ? green 
-          : white;
+    color = MainStrip.Color(leds_input.leds_color_r, leds_input.leds_color_g, leds_input.leds_color_b);
     switch (leds_input.leds_effect) {
       case 0: colorStatic(); break;
       case 1: colorFade(); break;
