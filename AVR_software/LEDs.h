@@ -15,17 +15,8 @@ Adafruit_NeoPixel MaskStripLeft(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_LEFT, NEO
 Adafruit_NeoPixel MaskStripRight(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_RIGHT, NEO_GRB + NEO_KHZ800);
 uint32_t black = MainStrip.Color(0, 0, 0);
 uint32_t white = MainStrip.Color(255, 255, 255);
-uint32_t red = MainStrip.Color(255, 0, 0);
-uint32_t purple = MainStrip.Color(115, 0, 255);
-uint32_t yellow = MainStrip.Color(255, 255, 0);
-uint32_t pink = MainStrip.Color(255, 0, 255);
-uint32_t deep_blue = MainStrip.Color(0, 0, 255);
-uint32_t light_blue = MainStrip.Color(0, 255, 255);
-uint32_t orange = MainStrip.Color(255, 165, 0);
-uint32_t green = MainStrip.Color(0, 255, 0);
-
-int Color_Brightness = 25; // 0 - 255
 uint32_t color = white;
+int Color_Brightness = 25; // 0 - 255
 
 struct LEDsTaskInput
 {

@@ -3,7 +3,7 @@
 #include "HardwareSim.h"
 #include "PCSandbox.h"
 #endif
-#define NUM_INPUTS 12
+#define NUM_INPUTS 14
 int inputs[NUM_INPUTS] = {0};
 
 String readFromSerial() {

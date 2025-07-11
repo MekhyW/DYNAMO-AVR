@@ -5,6 +5,6 @@
 //#define SIMULATE_HARDWARE // Uncomment to simulate hardware instead of using real hardware
 
 #define MAX_COMMAND_LENGTH 64
-#define MAX_ARGS 8
+#define MAX_ARGS 10
 
 #endif // TEST_CONFIG_H

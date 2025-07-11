@@ -32,10 +32,10 @@ void cmd_set_inputs(int argc, char* argv[]);
 
 const Command_t commands[] = {
     {"help", "Display available commands", cmd_help},
-    {"leds", "Test LED functionality: leds <effect> <color> <brightness>", cmd_leds_test},
+    {"leds", "Test LED functionality: leds <effect> <color_r> <color_g> <color_b> <brightness>", cmd_leds_test},
     {"servo", "Test servo functionality: servo <index> <position>", cmd_servo_test},
     {"emotion", "Test emotion blending: emotion <angry> <disgusted> <happy> <neutral> <sad> <surprised>", cmd_emotion_test},
-    {"inputs", "Set all inputs directly: inputs <12 comma-separated values>", cmd_set_inputs},
+    {"inputs", "Set all inputs directly: inputs <14 comma-separated values>", cmd_set_inputs},
     {NULL, NULL, NULL}
 };
 
@@ -131,7 +131,7 @@ void cmd_emotion_test(int argc, char* argv[]) {
 
 void cmd_set_inputs(int argc, char* argv[]) {
     if (argc < 2) {
-        Serial.println("Usage: inputs <12 comma-separated values>");
+        Serial.println("Usage: inputs <14 comma-separated values>");
         return;
     }
     if (g_queue_leds == NULL || g_queue_servos == NULL) {
@@ -140,15 +140,15 @@ void cmd_set_inputs(int argc, char* argv[]) {
     }
     char* input_str = argv[1];
     char* token;
-    int input_values[12];
+    int input_values[14];
     int count = 0;
     token = strtok(input_str, ",");
-    while (token != NULL && count < 12) {
+    while (token != NULL && count < 14) {
         input_values[count++] = atoi(token);
         token = strtok(NULL, ",");
     }
-    if (count != 12) {
-        Serial.print("Error: Expected 12 values, got ");
+    if (count != 14) {
+        Serial.print("Error: Expected 14 values, got ");
         Serial.println(count);
         return;
     }

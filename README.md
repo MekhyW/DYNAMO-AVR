@@ -36,14 +36,14 @@ Runs on the Lattepanda Delta´s Arduino Leonardo co-processor
 Once running, the CLI interface provides the following commands:
 
 - `help` - Show available commands
-- `leds <effect> <color> <brightness>` - Test LED effects
+- `leds <effect> <color_r> <color_g> <color_b> <brightness>` - Test LED effects
 - `servo <index> <position>` - Move a specific servo
 - `emotion <angry> <disgusted> <happy> <neutral> <sad> <surprised>` - Test emotion blending
-- `inputs <12 comma-separated values>` - Set all inputs at once
+- `inputs <14 comma-separated values>` - Set all inputs at once
 
 Example usage:
 ```
-> leds 0 1 50
+> leds 0 148 0 211 50
 LED test command sent
 
 > servo 0 120
@@ -51,4 +51,7 @@ Servo 0 moved to position 120
 
 > emotion 100 0 0 0 0 0
 Emotion test command sent
+
+> inputs 1,1,50,148,0,211,0,0,0,0,1,0,0,0
+Inputs updated successfully
 ```

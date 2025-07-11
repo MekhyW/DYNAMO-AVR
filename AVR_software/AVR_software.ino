@@ -123,12 +123,9 @@ void TaskServos(void *pvParameters) {
   ServosTaskInput servos_input;
   for (;;) {
     xQueueReceive(queue_servos, &servos_input, portMAX_DELAY);
-    float expressions_sum = servos_input.emotion_angry + servos_input.emotion_disgusted + servos_input.emotion_happy
-                            + servos_input.emotion_neutral + servos_input.emotion_sad + servos_input.emotion_surprised;
+    float expressions_sum = servos_input.emotion_angry + servos_input.emotion_disgusted + servos_input.emotion_happy + servos_input.emotion_neutral + servos_input.emotion_sad + servos_input.emotion_surprised;
     if (servos_input.animatronics_on == 1 && expressions_sum > 0) {
-      float emotions[NUM_EMOTIONS] = {servos_input.emotion_angry / expressions_sum, servos_input.emotion_disgusted / expressions_sum,
-                          servos_input.emotion_happy / expressions_sum, servos_input.emotion_neutral / expressions_sum,
-                          servos_input.emotion_sad / expressions_sum, servos_input.emotion_surprised / expressions_sum};
+      float emotions[NUM_EMOTIONS] = {servos_input.emotion_angry / expressions_sum, servos_input.emotion_disgusted / expressions_sum, servos_input.emotion_happy / expressions_sum, servos_input.emotion_neutral / expressions_sum, servos_input.emotion_sad / expressions_sum, servos_input.emotion_surprised / expressions_sum};
       int pos[NUM_SERVOS] = {0};
       for (int i = 0; i < NUM_EMOTIONS; i++) {
         for (int j = 0; j < NUM_SERVOS; j++) { pos[j] += emotions[i] * servo_calibration_matrix[i][j]; }
