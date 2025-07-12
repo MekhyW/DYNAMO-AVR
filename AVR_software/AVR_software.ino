@@ -130,7 +130,7 @@ void TaskServos(void *pvParameters) {
       for (int i = 0; i < NUM_EMOTIONS; i++) {
         for (int j = 0; j < NUM_SERVOS; j++) { pos[j] += emotions[i] * servo_calibration_matrix[i][j]; }
       }
-      writepos(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7]);
+      writepos(pos[0], pos[1]);
     }
     vTaskDelay(TASK_DELAY_MS / portTICK_PERIOD_MS);
   }

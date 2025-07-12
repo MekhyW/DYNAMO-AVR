@@ -15,12 +15,12 @@ Servo eyebrow_right;
 Servo servos[] = {eyebrow_left, eyebrow_right};
 
 int servo_calibration_matrix[NUM_EMOTIONS][NUM_SERVOS] = {
-  {90, 90}, // angry
-  {90, 90}, // disgusted
-  {90, 90}, // happy
+  {60, 120}, // angry
+  {105, 115}, // disgusted
+  {105, 75}, // happy
   {90, 90}, // neutral
-  {90, 90}, // sad
-  {90, 90}  // surprised
+  {75, 105}, // sad
+  {120, 60}  // surprised
 };
 
 struct ServosTaskInput
@@ -39,8 +39,7 @@ void setupServos() {
   servos[1].attach(SERVO_1_PIN);
 }
 
-void writepos(int eyebrow_left_pos, int eyebrow_right_pos, int ear_pan_left_pos, int ear_tilt_left_pos,
-              int ear_pan_right_pos, int ear_tilt_right_pos, int mouth_left_pos, int mouth_right_pos) {
+void writepos(int eyebrow_left_pos, int eyebrow_right_pos) {
   int newServoPositions[NUM_SERVOS] = { eyebrow_left_pos, eyebrow_right_pos };
   for (int i = 0; i < NUM_SERVOS; i++) {
     if (newServoPositions[i] < 0 || newServoPositions[i] > 180) return;
