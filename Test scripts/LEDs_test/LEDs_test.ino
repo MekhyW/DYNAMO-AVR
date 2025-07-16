@@ -1,8 +1,8 @@
 #include <Adafruit_NeoPixel.h>
-#define LED_PIN 10
-#define LED_COUNT 240
+#define LED_PIN 2
+#define LED_COUNT 28
 Adafruit_NeoPixel GearsStrip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-int Color_Brightness = 25;
+int Color_Brightness = 50;
 uint32_t black = GearsStrip.Color(0, 0, 0);
 uint32_t white = GearsStrip.Color(255, 255, 255);
 uint32_t red = GearsStrip.Color(255, 0, 0);
@@ -14,7 +14,7 @@ uint32_t light_blue = GearsStrip.Color(0, 255, 255);
 uint32_t orange = GearsStrip.Color(255, 165, 0);
 uint32_t green = GearsStrip.Color(0, 255, 0);
 
-void colorStatic(uint32_t color) {
+void colorStatic(uint32_t color) {e
   GearsStrip.setBrightness(Color_Brightness/2);
   GearsStrip.fill(color, 0, GearsStrip.numPixels());
   GearsStrip.show();

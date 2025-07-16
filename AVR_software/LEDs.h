@@ -6,8 +6,8 @@
 #include "PCSandbox.h"
 #endif
 #define LED_PIN_MAINSTRIP 13
-#define LED_PIN_MASKSTRIP_LEFT 0
-#define LED_PIN_MASKSTRIP_RIGHT 0
+#define LED_PIN_MASKSTRIP_LEFT 9
+#define LED_PIN_MASKSTRIP_RIGHT 4
 #define LED_COUNT_MAINSTRIP 240
 #define LED_COUNT_MASKSTRIP 6
 Adafruit_NeoPixel MainStrip(LED_COUNT_MAINSTRIP, LED_PIN_MAINSTRIP, NEO_GRB + NEO_KHZ800);
@@ -16,7 +16,7 @@ Adafruit_NeoPixel MaskStripRight(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_RIGHT, N
 uint32_t black = MainStrip.Color(0, 0, 0);
 uint32_t white = MainStrip.Color(255, 255, 255);
 uint32_t color = white;
-int Color_Brightness = 25; // 0 - 255
+int Color_Brightness = 50; // 0 - 255
 
 struct LEDsTaskInput
 {
