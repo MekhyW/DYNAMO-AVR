@@ -1,6 +1,10 @@
 #ifndef TEST_CONFIG_H
 #define TEST_CONFIG_H
 
+#ifdef TEST_MODE
+#undef TEST_MODE
+#endif
+
 //#define TEST_MODE // Uncomment this to enable test mode
 //#define SIMULATE_HARDWARE // Uncomment to simulate hardware instead of using real hardware
 
