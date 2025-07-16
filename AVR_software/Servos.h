@@ -8,7 +8,7 @@
 #define NUM_SERVOS 2
 #define NUM_EMOTIONS 6
 #define SERVO_0_PIN 6
-#define SERVO_1_PIN 11
+#define SERVO_1_PIN 14
 
 Servo eyebrow_left;
 Servo eyebrow_right;
