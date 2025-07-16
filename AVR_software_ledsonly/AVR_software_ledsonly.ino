@@ -58,7 +58,7 @@ void parseCommand(String command) {
       startIndex = i + 1;
     }
   }
-  if (valueCount == 14) {
+  if (valueCount >= 14) {
     Serial.println(command);
     leds_on = values[1];
     leds_brightness = values[2];
