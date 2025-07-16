@@ -19,11 +19,21 @@ void writepos(int pos) {
 
 void loop() {
   Serial.println("Sweep...");
-  for (pos = 0; pos <= 180; pos += 1) {
+  for (pos = 0; pos <= 90; pos += 1) {
     writepos(pos);
     delay(15);
   }
-  for (pos = 180; pos >= 0; pos -= 1) {
+  delay(1000);
+  for (pos = 90; pos <= 180; pos += 1) {
+    writepos(pos);
+    delay(15);
+  }
+  for (pos = 180; pos >= 90; pos -= 1) {
+    writepos(pos);
+    delay(15); 
+  }
+  delay(1000);
+  for (pos = 90; pos >= 0; pos -= 1) {
     writepos(pos);
     delay(15); 
   }
