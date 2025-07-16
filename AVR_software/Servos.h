@@ -37,6 +37,7 @@ struct ServosTaskInput
 void setupServos() {
   servos[0].attach(SERVO_0_PIN);
   servos[1].attach(SERVO_1_PIN);
+  Serial.println("Servos initialized");
 }
 
 void writepos(int eyebrow_left_pos, int eyebrow_right_pos) {

@@ -8,8 +8,8 @@
 #define LED_PIN_MAINSTRIP 13
 #define LED_PIN_MASKSTRIP_LEFT 9
 #define LED_PIN_MASKSTRIP_RIGHT 4
-#define LED_COUNT_MAINSTRIP 240
-#define LED_COUNT_MASKSTRIP 6
+#define LED_COUNT_MAINSTRIP 20
+#define LED_COUNT_MASKSTRIP 7
 Adafruit_NeoPixel MainStrip(LED_COUNT_MAINSTRIP, LED_PIN_MAINSTRIP, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel MaskStripLeft(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_LEFT, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel MaskStripRight(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_RIGHT, NEO_GRB + NEO_KHZ800);
@@ -188,4 +188,5 @@ void setupLEDs() {
   setBrightnessStrips(Color_Brightness);
   clearStrips();
   showStrips();
+  Serial.println("LEDs initialized");
 }
