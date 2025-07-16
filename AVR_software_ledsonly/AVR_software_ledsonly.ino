@@ -34,7 +34,7 @@ void setup() {
 
 void loop() {
   while (Serial.available()) {
-    String command = Serial.readStringUntil('\n');
+    command = Serial.readStringUntil('\n');
     command.trim();
   }
   if (command.length() > 0) {
