@@ -18,6 +18,7 @@ int leds_color_g = 255;
 int leds_color_b = 255;
 int leds_effect = 0;
 int leds_level = 100;
+String command = "0,1,50,255,255,255,0,100,0,0,0,0,0,0";
 
 void setup() {
   Serial.begin(9600);
@@ -32,12 +33,12 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
+  while (Serial.available()) {
     String command = Serial.readStringUntil('\n');
     command.trim();
-    if (command.length() > 0) {
-      parseCommand(command);
-    }
+  }
+  if (command.length() > 0) {
+    parseCommand(command);
   }
   if (leds_on) {
     executeEffect();
