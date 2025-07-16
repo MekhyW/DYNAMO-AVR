@@ -18,7 +18,6 @@ int leds_color_g = 255;
 int leds_color_b = 255;
 int leds_effect = 0;
 int leds_level = 100;
-String command = "0,1,50,255,255,255,0,100,0,0,0,0,0,0";
 
 void setup() {
   Serial.begin(9600);
@@ -33,12 +32,12 @@ void setup() {
 }
 
 void loop() {
-  while (Serial.available()) {
-    command = Serial.readStringUntil('\n');
+  if (Serial.available()) {
+    String command = Serial.readStringUntil('\n');
     command.trim();
-  }
-  if (command.length() > 0) {
-    parseCommand(command);
+    if (command.length() > 0) {
+      parseCommand(command);
+    }
   }
   if (leds_on) {
     executeEffect();
@@ -49,6 +48,8 @@ void parseCommand(String command) {
   int values[14];
   int valueCount = 0;
   int startIndex = 0;
+  
+  // Parse comma-separated values
   for (int i = 0; i <= command.length(); i++) {
     if (i == command.length() || command.charAt(i) == ',') {
       if (valueCount < 14) {
@@ -59,7 +60,7 @@ void parseCommand(String command) {
       startIndex = i + 1;
     }
   }
-  if (valueCount >= 14) {
+  if (valueCount == 14) {
     Serial.println(command);
     leds_on = values[1];
     leds_brightness = values[2];
