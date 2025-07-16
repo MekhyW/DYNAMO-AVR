@@ -32,12 +32,16 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
+  String lastCommand = "";
+  while (Serial.available()) {
     String command = Serial.readStringUntil('\n');
     command.trim();
     if (command.length() > 0) {
-      parseCommand(command);
+      lastCommand = command;
     }
+  }
+  if (lastCommand.length() > 0) {
+    parseCommand(lastCommand);
   }
   if (leds_on) {
     executeEffect();
