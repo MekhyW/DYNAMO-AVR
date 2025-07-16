@@ -19,16 +19,6 @@ int leds_color_b = 255;
 int leds_effect = 0;
 int leds_level = 100;
 
-// Effect state variables for continuous animation
-int effect_step = 0;
-long effect_timer = 0;
-int fade_direction = 1;
-int wipe_direction = 1;
-int theater_step = 0;
-long rainbow_hue = 0;
-int strobe_count = 0;
-int moving_position = 0;
-
 void setup() {
   Serial.begin(9600);
   MainStrip.begin();
@@ -93,22 +83,22 @@ void executeEffect() {
       colorStatic();
       break;
     case 1:
-      colorFadeContinuous();
+      colorFade();
       break;
     case 2:
-      colorWipeContinuous();
+      colorWipe();
       break;
     case 3:
-      colorTheaterChaseContinuous();
+      colorTheaterChase();
       break;
     case 4:
-      RainbowContinuous();
+      Rainbow();
       break;
     case 5:
-      colorStrobeContinuous();
+      colorStrobe();
       break;
     case 6:
-      colorMovingSubstripsContinuous();
+      colorMovingSubstrips();
       break;
     case 7:
       colorLevel(leds_level);
@@ -149,127 +139,113 @@ void colorStatic() {
   showStrips();
 }
 
-void colorFadeContinuous() {
-  if (millis() - effect_timer > 20) {
+void colorFade() {
+  setBrightnessStrips(Color_Brightness);
+  for(int k = 0; k < Color_Brightness*2; k++) {
     fillStrips(color);
-    setBrightnessStrips(effect_step);
+    setBrightnessStrips(k);
     showStrips();
-    if (fade_direction == 1) {
-      effect_step++;
-      if (effect_step >= Color_Brightness*2) {
-        fade_direction = -1;
-      }
-    } else {
-      effect_step--;
-      if (effect_step <= 0) {
-        fade_direction = 1;
-      }
-    }
-    effect_timer = millis();
+    delay(20);
+  }
+  for(int k = Color_Brightness*2; k > 0; k--) {
+    fillStrips(color);
+    setBrightnessStrips(k);
+    showStrips();
+    delay(20);
   }
 }
 
-void colorWipeContinuous() {
-  if (millis() - effect_timer > 50) {
-    setBrightnessStrips(Color_Brightness);
-    if (effect_step < MainStrip.numPixels()) {
-      if (wipe_direction == 1) {
-        MainStrip.setPixelColor(effect_step, color);
-      } else {
-        MainStrip.setPixelColor(effect_step, black);
-      }
-    } else if (effect_step < MainStrip.numPixels() + MaskStripLeft.numPixels()) {
-      int maskIndex = effect_step - MainStrip.numPixels();
-      if (wipe_direction == 1) {
-        MaskStripLeft.setPixelColor(maskIndex, color);
-        MaskStripRight.setPixelColor(maskIndex, color);
-      } else {
-        MaskStripLeft.setPixelColor(maskIndex, black);
-        MaskStripRight.setPixelColor(maskIndex, black);
-      }
+void colorWipe() {
+  setBrightnessStrips(Color_Brightness);
+  if (MainStrip.getPixelColor(0) == 0) {
+    for(uint16_t i=0; i<MainStrip.numPixels(); i++) {
+      MainStrip.setPixelColor(i, color);
+      showStrips();
+      delay(20);
     }
-    showStrips();
-    effect_step++;
-    if (effect_step >= MainStrip.numPixels() + MaskStripLeft.numPixels()) {
-      effect_step = 0;
-      wipe_direction = -wipe_direction;
+    for(uint16_t i=0; i<MaskStripLeft.numPixels(); i++) {
+      MaskStripLeft.setPixelColor(i, color);
+      MaskStripRight.setPixelColor(i, color);
+      showStrips();
+      delay(20);
     }
-    effect_timer = millis();
+  } else {
+    for(uint16_t i=0; i<MainStrip.numPixels(); i++) {
+      MainStrip.setPixelColor(i, black);
+      showStrips();
+      delay(20);
+    }
+    for(uint16_t i=0; i<MaskStripLeft.numPixels(); i++) {
+      MaskStripLeft.setPixelColor(i, black);
+      MaskStripRight.setPixelColor(i, black);
+      showStrips();
+      delay(20);
+    }
   }
 }
 
-void colorTheaterChaseContinuous() {
-  if (millis() - effect_timer > 200) {
-    setBrightnessStrips(Color_Brightness*2);
+void colorTheaterChase() {
+  setBrightnessStrips(Color_Brightness*2);
+  for(int b=0; b<3; b++) {
     clearStrips();
-    for(int c=theater_step; c<MainStrip.numPixels(); c += 3) {
+    for(int c=b; c<MainStrip.numPixels(); c += 3) {
       MainStrip.setPixelColor(c, color);
     }
-    for(int c=theater_step; c<MaskStripLeft.numPixels(); c += 3) {
+    for(int c=b; c<MaskStripLeft.numPixels(); c += 3) {
       MaskStripLeft.setPixelColor(c, color);
       MaskStripRight.setPixelColor(c, color);
     }
     showStrips();
-    theater_step = (theater_step + 1) % 3;
-    effect_timer = millis();
+    delay(200);
   }
 }
 
-void RainbowContinuous() {
-  if (millis() - effect_timer > 50) {
-    setBrightnessStrips(Color_Brightness*2);
+void Rainbow() {
+  setBrightnessStrips(Color_Brightness*2);
+  for(long firstPixelHue = 0; firstPixelHue < 65536; firstPixelHue += 512) {
     for(int i=0; i<MainStrip.numPixels(); i++) {
-      int pixelHue = rainbow_hue + (i * 65536L / MainStrip.numPixels());
+      int pixelHue = firstPixelHue + (i * 65536L / MainStrip.numPixels());
       MainStrip.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
     }
     for(int i=0; i<MaskStripLeft.numPixels(); i++) {
-      int pixelHue = rainbow_hue + (i * 65536L / MaskStripLeft.numPixels());
+      int pixelHue = firstPixelHue + (i * 65536L / MaskStripLeft.numPixels());
       MaskStripLeft.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
       MaskStripRight.setPixelColor(i, MainStrip.gamma32(MainStrip.ColorHSV(pixelHue)));
     }
     showStrips();
-    rainbow_hue += 512;
-    if (rainbow_hue >= 65536) {
-      rainbow_hue = 0;
-    }
-    effect_timer = millis();
+    delay(50);
   }
 }
 
-void colorStrobeContinuous() {
-  if (millis() - effect_timer > 100) {
-    setBrightnessStrips(Color_Brightness/2);
-    if (effect_step % 2 == 0) {
-      fillStrips(color);
-    } else {
-      clearStrips();
-    }
+void colorStrobe() {
+  setBrightnessStrips(Color_Brightness/2);
+  for(int j = 0; j < 5; j++) {
+    fillStrips(color);
     showStrips();
-    effect_step++;
-    if (effect_step >= 10) {
-      effect_step = 0;
-    }
-    effect_timer = millis();
+    delay(50);
+    clearStrips();
+    showStrips();
+    delay(50);
   }
+  delay(1000);
 }
 
-void colorMovingSubstripsContinuous() {
-  if (millis() - effect_timer > 50) {
-    uint32_t color_a = color;
-    uint32_t color_b = black;
-    setBrightnessStrips(Color_Brightness*2);
-    int numPixels = MainStrip.numPixels();
-    int substrip_size = numPixels/10;
+void colorMovingSubstrips() {
+  uint32_t color_a = color;
+  uint32_t color_b = black;
+  setBrightnessStrips(Color_Brightness*2);
+  int numPixels = MainStrip.numPixels();
+  int substrip_size = numPixels/10;
+  for(int i = 0; i < numPixels; i++) {
     clearStrips();
     for(int j = 0; j < numPixels; j += substrip_size*2) {
-      int startPixel = (moving_position + j) % numPixels;
+      int startPixel = (i + j) % numPixels;
       MainStrip.fill(color_a, startPixel, substrip_size);
       int endPixel = (startPixel + substrip_size) % numPixels;
       MainStrip.fill(color_b, endPixel, substrip_size);
     }
     MainStrip.show();
-    moving_position = (moving_position + 1) % numPixels;
-    effect_timer = millis();
+    delay(20);
   }
 }
 
