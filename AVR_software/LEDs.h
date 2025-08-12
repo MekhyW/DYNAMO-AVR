@@ -16,7 +16,7 @@ Adafruit_NeoPixel MaskStripRight(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_RIGHT, N
 uint32_t black = MainStrip.Color(0, 0, 0);
 uint32_t white = MainStrip.Color(255, 255, 255);
 uint32_t color = white;
-int Color_Brightness = 50; // 0 - 255
+int Color_Brightness = 150; // 0 - 255
 
 struct LEDsTaskInput
 {
@@ -58,13 +58,13 @@ void colorStatic() {
 
 void colorFade() {
   setBrightnessStrips(Color_Brightness);
-  for(int k = 0; k < Color_Brightness*2; k++) {
+  for(int k = Color_Brightness/3; k < Color_Brightness*2; k++) {
     fillStrips(color);
     setBrightnessStrips(k);
     showStrips();
     vTaskDelay(20 / portTICK_PERIOD_MS);
   }
-  for(int k = Color_Brightness*2; k > 0; k--) {
+  for(int k = Color_Brightness*2; k > Color_Brightness/3; k--) {
     fillStrips(color);
     setBrightnessStrips(k);
     showStrips();
@@ -136,16 +136,13 @@ void Rainbow() {
 }
 
 void colorStrobe() {
-  setBrightnessStrips(Color_Brightness/2);
-  for(int j = 0; j < 5; j++) {
-    fillStrips(color);
-    showStrips();
-    vTaskDelay(50 / portTICK_PERIOD_MS);
-    clearStrips();
-    showStrips();
-    vTaskDelay(50 / portTICK_PERIOD_MS);
-  }
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
+  fillStrips(color);
+  setBrightnessStrips(Color_Brightness);
+  showStrips();
+  vTaskDelay(75 / portTICK_PERIOD_MS);
+  setBrightnessStrips(Color_Brightness/4);
+  showStrips();
+  vTaskDelay(75 / portTICK_PERIOD_MS);
 }
 
 void colorMovingSubstrips() {

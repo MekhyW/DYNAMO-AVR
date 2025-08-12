@@ -10,7 +10,7 @@ Adafruit_NeoPixel MaskStripRight(LED_COUNT_MASKSTRIP, LED_PIN_MASKSTRIP_RIGHT, N
 uint32_t black = MainStrip.Color(0, 0, 0);
 uint32_t white = MainStrip.Color(255, 255, 255);
 uint32_t color = white;
-int Color_Brightness = 50; // 0 - 255
+int Color_Brightness = 150; // 0 - 255
 int leds_on = 0;
 int leds_brightness = 50;
 int leds_color_r = 255;
@@ -147,13 +147,13 @@ void colorStatic() {
 
 void colorFade() {
   setBrightnessStrips(Color_Brightness);
-  for(int k = 0; k < Color_Brightness*2; k++) {
+  for(int k = Color_Brightness/3; k < Color_Brightness*2; k++) {
     fillStrips(color);
     setBrightnessStrips(k);
     showStrips();
     delay(20);
   }
-  for(int k = Color_Brightness*2; k > 0; k--) {
+  for(int k = Color_Brightness*2; k > Color_Brightness/3; k--) {
     fillStrips(color);
     setBrightnessStrips(k);
     showStrips();
@@ -224,16 +224,13 @@ void Rainbow() {
 }
 
 void colorStrobe() {
-  setBrightnessStrips(Color_Brightness/2);
-  for(int j = 0; j < 5; j++) {
-    fillStrips(color);
-    showStrips();
-    delay(50);
-    clearStrips();
-    showStrips();
-    delay(50);
-  }
-  delay(1000);
+  fillStrips(color);
+  setBrightnessStrips(Color_Brightness);
+  showStrips();
+  delay(75);
+  setBrightnessStrips(Color_Brightness/4);
+  showStrips();
+  delay(75);
 }
 
 void colorMovingSubstrips() {
