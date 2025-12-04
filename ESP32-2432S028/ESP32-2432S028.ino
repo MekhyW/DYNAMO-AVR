@@ -7,7 +7,7 @@ TFT_eSprite eyeSprite = TFT_eSprite(&tft);
 
 float lx = 0, ly = 0;
 float rx = 0, ry = 0;
-float expr = 0;
+float eyeclose = 0.2;
 
 String logBuffer;
 const int LOG_LINES = 6;  
@@ -32,14 +32,14 @@ void drawEyes() {
   int ry0 = padding;
   int pupilR = 20;
   int moveRange = 25;
-  int eyelidDrop = (int)(expr * 40);
+  int eyelidDrop = (int)((eyeclose - 0.2) * eyeH);
   eyeSprite.fillRoundRect(lx0, ly0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, TFT_WHITE);
   int lcx = lx0 + eyeW/2 + lx * moveRange;
-  int lcy = ly0 + eyeH/2 + ly * moveRange + eyelidDrop;
+  int lcy = ly0 + eyeH/2 + ly * moveRange;
   eyeSprite.fillCircle(lcx, lcy, pupilR, TFT_BLACK);
   eyeSprite.fillRoundRect(rx0, ry0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, TFT_WHITE);
   int rcx = rx0 + eyeW/2 + rx * moveRange;
-  int rcy = ry0 + eyeH/2 + ry * moveRange + eyelidDrop;
+  int rcy = ry0 + eyeH/2 + ry * moveRange;
   eyeSprite.fillCircle(rcx, rcy, pupilR, TFT_BLACK);
   eyeSprite.pushSprite(0, 0);
 }
@@ -81,7 +81,7 @@ void loop() {
             ly = -2*incoming.substring(idx2+1, idx3).toFloat();
             rx = 2*incoming.substring(idx3+1, idx4).toFloat();
             ry = -2*incoming.substring(idx4+1, idx5).toFloat();
-            expr = incoming.substring(idx5+1).toFloat();
+            eyeclose = incoming.substring(idx5+1).toFloat();
           }
         } else { pushLog(incoming); }
       }
