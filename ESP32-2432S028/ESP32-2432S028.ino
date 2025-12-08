@@ -15,7 +15,7 @@ TFT_eSprite eyeSprite = TFT_eSprite(&tft);
 
 float lx = 0, ly = 0;
 float rx = 0, ry = 0;
-float eyeclose = 0.2;
+float eyecloseL = 0.2, eyecloseR = 0.2;
 float expr = 3;
 
 String logBuffer;
@@ -65,12 +65,13 @@ void drawEyes() {
   int ry0 = paddingY;
   int pupilR = 15;
   int moveRange = 20;
-  int eyelidDrop = (int)((eyeclose - 0.2) * eyeH);
-  eyeSprite.fillRoundRect(lx0, ly0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, invertColor(colors.sclera));
+  int eyelidDropL = (int)((eyecloseL - 0.2) * eyeH);
+  int eyelidDropR = (int)((eyecloseR - 0.2) * eyeH);
+  eyeSprite.fillRoundRect(lx0, ly0 + eyelidDropL, eyeW, eyeH - eyelidDropL, 20, invertColor(colors.sclera));
   int lcx = lx0 + eyeW/2 + lx * moveRange;
   int lcy = ly0 + eyeH/2 + ly * moveRange;
   eyeSprite.fillCircle(lcx, lcy, pupilR, invertColor(colors.pupil));
-  eyeSprite.fillRoundRect(rx0, ry0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, invertColor(colors.sclera));
+  eyeSprite.fillRoundRect(rx0, ry0 + eyelidDropR, eyeW, eyeH - eyelidDropR, 20, invertColor(colors.sclera));
   int rcx = rx0 + eyeW/2 + rx * moveRange;
   int rcy = ry0 + eyeH/2 + ry * moveRange;
   eyeSprite.fillCircle(rcx, rcy, pupilR, invertColor(colors.pupil));
@@ -114,13 +115,15 @@ void loop() {
           int idx4 = incoming.indexOf(',', idx3+1);
           int idx5 = incoming.indexOf(',', idx4+1);
           int idx6 = incoming.indexOf(',', idx5+1);
-          if (idx1 > 0 && idx6 > idx5) {
+          int idx7 = incoming.indexOf(',', idx6+1);
+          if (idx1 > 0 && idx7 > idx6) {
             lx = 2*incoming.substring(idx1+1, idx2).toFloat();
             ly = -2*incoming.substring(idx2+1, idx3).toFloat();
             rx = 2*incoming.substring(idx3+1, idx4).toFloat();
             ry = -2*incoming.substring(idx4+1, idx5).toFloat();
-            eyeclose = incoming.substring(idx5+1, idx6).toFloat();
-            expr = incoming.substring(idx6+1).toInt();
+            eyecloseL = incoming.substring(idx5+1, idx6).toFloat();
+            eyecloseR = incoming.substring(idx6+1, idx7).toFloat();
+            expr = incoming.substring(idx7+1).toInt();
           }
         } else { pushLog(incoming); }
       }
