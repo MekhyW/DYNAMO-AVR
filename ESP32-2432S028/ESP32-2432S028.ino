@@ -23,22 +23,26 @@ const int LOG_LINES = 6;
 String logLines[LOG_LINES];
 bool logsChanged = true;
 
+uint16_t invertColor(uint16_t color) {
+  return ~color & 0xFFFF;
+}
+
 EyeColors getEyeColors(int expression) {
   switch (expression) {
-    case 0:  return {TFT_WHITE, TFT_RED};       // 0 = white eyes, red pupils
-    case 1:  return {TFT_WHITE, TFT_GREEN};     // 1 = white eyes, green pupils
-    case 2:  return {TFT_YELLOW, TFT_BLACK};    // 2 = yellow eyes, black pupils
-    case 3:  return {TFT_WHITE, TFT_BLACK};     // 3 = white eyes, black pupils
-    case 4:  return {TFT_WHITE, TFT_BLUE};      // 4 = white eyes, blue pupils
-    case 5:  return {TFT_WHITE, TFT_BLACK};     // 5 = white eyes, black pupils
-    case 6:  return {TFT_BLACK, TFT_WHITE};     // 6 = black eyes, white pupils
-    case 7:  return {TFT_PINK, TFT_RED};        // 7 = pink eyes, red pupils
-    case 8:  return {TFT_PURPLE, TFT_YELLOW};   // 8 = purple eyes, yellow pupils
-    case 9:  return {TFT_BLACK, TFT_RED};       // 9 = black eyes, red pupils
-    case 10: return {TFT_BLACK, TFT_WHITE};     // 10 = black eyes, white pupils
-    case 11: return {TFT_BLACK, TFT_LIGHTBLUE}; // 11 = black eyes, light blue pupils
-    case 12: return {TFT_WHITE, TFT_PINK};      // 12 = white eyes, pink pupils
-    default: return {TFT_WHITE, TFT_BLACK};     // Default
+    case 0:  return {TFT_LIGHTGREY, TFT_RED};
+    case 1:  return {TFT_LIGHTGREY, TFT_GREEN};
+    case 2:  return {TFT_YELLOW, TFT_BLACK};
+    case 3:  return {TFT_LIGHTGREY, TFT_BLACK};
+    case 4:  return {TFT_LIGHTGREY, TFT_BLUE};
+    case 5:  return {TFT_LIGHTGREY, TFT_BLACK};
+    case 6:  return {TFT_BLACK, TFT_LIGHTGREY};
+    case 7:  return {TFT_PINK, TFT_RED};
+    case 8:  return {TFT_PURPLE, TFT_YELLOW};
+    case 9:  return {TFT_BLACK, TFT_RED};
+    case 10: return {TFT_BLACK, TFT_LIGHTGREY};
+    case 11: return {TFT_BLACK, TFT_LIGHTBLUE};
+    case 12: return {TFT_LIGHTGREY, TFT_PINK};
+    default: return {TFT_LIGHTGREY, TFT_BLACK};
   }
 }
 
@@ -49,7 +53,7 @@ void pushLog(const String &msg) {
 }
 
 void drawEyes() {
-  eyeSprite.fillSprite(TFT_BLACK);
+  eyeSprite.fillSprite(invertColor(TFT_BLACK));
   EyeColors colors = getEyeColors(expr);
   int eyeW = 90;
   int eyeH = 100;
@@ -62,22 +66,22 @@ void drawEyes() {
   int pupilR = 15;
   int moveRange = 20;
   int eyelidDrop = (int)((eyeclose - 0.2) * eyeH);
-  eyeSprite.fillRoundRect(lx0, ly0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, colors.sclera);
+  eyeSprite.fillRoundRect(lx0, ly0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, invertColor(colors.sclera));
   int lcx = lx0 + eyeW/2 + lx * moveRange;
   int lcy = ly0 + eyeH/2 + ly * moveRange;
-  eyeSprite.fillCircle(lcx, lcy, pupilR, colors.pupil);
-  eyeSprite.fillRoundRect(rx0, ry0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, colors.sclera);
+  eyeSprite.fillCircle(lcx, lcy, pupilR, invertColor(colors.pupil));
+  eyeSprite.fillRoundRect(rx0, ry0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, invertColor(colors.sclera));
   int rcx = rx0 + eyeW/2 + rx * moveRange;
   int rcy = ry0 + eyeH/2 + ry * moveRange;
-  eyeSprite.fillCircle(rcx, rcy, pupilR, colors.pupil);
+  eyeSprite.fillCircle(rcx, rcy, pupilR, invertColor(colors.pupil));
   eyeSprite.pushSprite(0, 0);
 }
 
 void drawLogs() {
   if (!logsChanged) return;
   int y0 = 170;
-  tft.fillRect(0, 160, 240, 160, 0x2104);
-  tft.setTextColor(TFT_CYAN);
+  tft.fillRect(0, 160, 240, 160, invertColor(TFT_BLACK));
+  tft.setTextColor(invertColor(TFT_WHITE));
   tft.setTextSize(1);
   tft.setTextDatum(TC_DATUM);
   for (int i = LOG_LINES - 1; i >= 0; i--) { 
@@ -92,7 +96,7 @@ void setup() {
   Serial.begin(115200);
   tft.init();
   tft.setRotation(0); // Vertical 240x320
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(invertColor(TFT_BLACK));
   eyeSprite.createSprite(240, 160);
   pushLog("Boot OK");
 }
