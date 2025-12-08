@@ -51,15 +51,16 @@ void pushLog(const String &msg) {
 void drawEyes() {
   eyeSprite.fillSprite(TFT_BLACK);
   EyeColors colors = getEyeColors(expr);
-  int eyeW = 130;
-  int eyeH = 120;
-  int padding = 15;
-  int lx0 = padding;
-  int ly0 = padding;
-  int rx0 = 160 + padding;
-  int ry0 = padding;
-  int pupilR = 20;
-  int moveRange = 25;
+  int eyeW = 90;
+  int eyeH = 100;
+  int paddingX = 15;
+  int paddingY = 30;
+  int lx0 = paddingX;
+  int ly0 = paddingY;
+  int rx0 = 120 + paddingX;
+  int ry0 = paddingY;
+  int pupilR = 15;
+  int moveRange = 20;
   int eyelidDrop = (int)((eyeclose - 0.2) * eyeH);
   eyeSprite.fillRoundRect(lx0, ly0 + eyelidDrop, eyeW, eyeH - eyelidDrop, 20, colors.sclera);
   int lcx = lx0 + eyeW/2 + lx * moveRange;
@@ -75,12 +76,12 @@ void drawEyes() {
 void drawLogs() {
   if (!logsChanged) return;
   int y0 = 170;
-  tft.fillRect(0, 160, 320, 80, 0x2104);
+  tft.fillRect(0, 160, 240, 160, 0x2104);
   tft.setTextColor(TFT_CYAN);
   tft.setTextSize(1);
   tft.setTextDatum(TC_DATUM);
   for (int i = LOG_LINES - 1; i >= 0; i--) { 
-    tft.drawString(logLines[i], 160, y0);
+    tft.drawString(logLines[i], 120, y0);
     y0 += tft.fontHeight();
   }
   tft.setTextDatum(TL_DATUM);
@@ -90,9 +91,9 @@ void drawLogs() {
 void setup() {
   Serial.begin(115200);
   tft.init();
-  tft.setRotation(1);
+  tft.setRotation(0); // Vertical 240x320
   tft.fillScreen(TFT_BLACK);
-  eyeSprite.createSprite(320, 160);
+  eyeSprite.createSprite(240, 160);
   pushLog("Boot OK");
 }
 
